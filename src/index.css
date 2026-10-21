@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-grid-bg: #0B0F14;
+  --color-grid-surface: #111827;
+  --color-grid-card: #172033;
+  --color-grid-elevated: #1C2636;
+  --color-grid-border: #2A3547;
+  --color-grid-steel: #5B7C99;
+  --color-grid-teal: #4F8F8B;
+  --color-grid-green: #5E9C76;
+  --color-grid-yellow: #D6A84F;
+  --color-grid-amber: #C47A3A;
+  --color-grid-red: #B94A48;
+  --color-grid-redbright: #D04F4F;
+  --color-grid-text: #E7E9ED;
+  --color-grid-muted: #9299A8;
+  --color-grid-dim: #374151;
+}
+
+body {
+  background-color: var(--color-grid-bg);
+  color: var(--color-grid-text);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0F14;
+}
+::-webkit-scrollbar-thumb {
+  background: #2A3547;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5B7C99;
+}
+
+/* Electrical pulse keyframes for transformer flow (subtle, non-neon) */
+@keyframes electricFlow {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-electric-flow {
+  stroke-dasharray: 6 6;
+  animation: electricFlow 1.2s linear infinite;
+}
+
+@keyframes subtlePulseRed {
+  0%, 100% {
+    border-color: #B94A48;
+  }
+  50% {
+    border-color: #D04F4F;
+  }
+}
+
+.pulse-critical {
+  animation: subtlePulseRed 2s ease-in-out infinite;
+}
+
+.font-mono-num {
+  font-variant-numeric: tabular-nums;
+}

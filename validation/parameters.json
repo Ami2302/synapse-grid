@@ -1,0 +1,374 @@
+[
+ {
+  "title": "A. Disturbance score",
+  "params": [
+   {
+    "symbol": "α",
+    "value": 2,
+    "unit": "–",
+    "purpose": "Weight of the squared load-excess term u_L²",
+    "rationale": "Loading is the primary driver of overload in the twin (state labels use L ≥ 115 %). A value of 2 makes D ≈ 0.48 when a unit reaches 100 % with an ONAN safe limit of 80 %, i.e. action starts before the 115 % overload label.",
+    "effect": "Larger α → disturbance detected at lower loading; smaller α → later detection.",
+    "tuning": "Sweep α in Load-Ramp runs and choose the smallest value for which D crosses D_act before the twin labels OVERLOAD."
+   },
+   {
+    "symbol": "β",
+    "value": 2.5,
+    "unit": "–",
+    "purpose": "Weight of the squared temperature-excess term u_T²",
+    "rationale": "Temperature carries the slow, cumulative part of the risk and controls when recovery can be confirmed; it is weighted slightly above load so a hot unit is not declared recovered just because its load dropped.",
+    "effect": "Larger β → longer recovery confirmation after a transfer.",
+    "tuning": "Run the overload→transfer scenario and pick β so that recovery is confirmed when θ falls a few kelvin above T_safe."
+   },
+   {
+    "symbol": "γ",
+    "value": 0.8,
+    "unit": "–",
+    "purpose": "Weight of the voltage-deviation term u_V",
+    "rationale": "Voltage sags in the twin (−5 % to −15 %) are secondary disturbances; γ = 0.8 makes a 10 % sag alone give D ≈ 0.79, i.e. a warning/action on its own.",
+    "effect": "Larger γ → more sensitive to sags.",
+    "tuning": "Use Voltage-Sag scenario runs; γ should make the sag window D ≥ D_warn."
+   },
+   {
+    "symbol": "δ",
+    "value": 1,
+    "unit": "–",
+    "purpose": "Weight of the current-consistency term u_I",
+    "rationale": "u_I flags current that is not explained by the loading (sag or fault current). Unit weight keeps it comparable to the other terms.",
+    "effect": "Larger δ → faster reaction to fault currents.",
+    "tuning": "Fault-Event runs: δ should push D above D_crit during the fault window."
+   },
+   {
+    "symbol": "κ",
+    "value": 1.5,
+    "unit": "–",
+    "purpose": "Weight of the load × temperature synergy term u_L·u_T",
+    "rationale": "An overload on an already hot transformer is worse than either condition alone (ageing accelerates with both). The cross term adds risk only when both are present.",
+    "effect": "Larger κ → stronger penalty for simultaneous load and thermal excess.",
+    "tuning": "Compare a cold and a pre-heated overload with equal load; κ sets how much earlier the hot case escalates."
+   },
+   {
+    "symbol": "d_V",
+    "value": 0.03,
+    "unit": "p.u.",
+    "purpose": "Voltage-deviation dead-band",
+    "rationale": "The twin drops voltage by 2.5 % at rated load by design; deviations within 3 % are normal regulation, not a disturbance.",
+    "effect": "Larger d_V → ignores bigger deviations.",
+    "tuning": "Set just above the largest deviation seen in Normal-Operation runs."
+   },
+   {
+    "symbol": "ε_V",
+    "value": 0.05,
+    "unit": "p.u.",
+    "purpose": "Voltage-deviation scale beyond the dead-band",
+    "rationale": "A further 5 % deviation (8 % total) gives u_V = 1, a full-weight voltage disturbance.",
+    "effect": "Smaller ε_V → u_V grows faster.",
+    "tuning": "Match to the statutory voltage band used by the utility (±5 % to ±10 %)."
+   },
+   {
+    "symbol": "d_I",
+    "value": 0.05,
+    "unit": "–",
+    "purpose": "Dead-band of the current-consistency ratio",
+    "rationale": "With noise and the small load-dependent voltage drop the ratio (I/I_r)/(L/100) stays within 5 % of 1 in normal operation.",
+    "effect": "Larger d_I → ignores bigger current mismatches.",
+    "tuning": "Set above the 99th percentile of the ratio in Normal-Operation data."
+   },
+   {
+    "symbol": "σ_I",
+    "value": 0.25,
+    "unit": "–",
+    "purpose": "Scale of the current-consistency excess",
+    "rationale": "A current 30 % above what the load explains gives u_I = 1.",
+    "effect": "Smaller σ_I → u_I grows faster.",
+    "tuning": "Fault-Event data: choose so fault windows give u_I ≫ 1."
+   }
+  ]
+ },
+ {
+  "title": "References",
+  "params": [
+   {
+    "symbol": "L_crit",
+    "value": 115,
+    "unit": "%",
+    "purpose": "Load at which the twin labels OVERLOAD",
+    "rationale": "Taken from the twin labelling rule (Eq. 8 of the paper).",
+    "effect": "Normalises u_L.",
+    "tuning": "Fixed by the labelling rule."
+   },
+   {
+    "symbol": "T_crit",
+    "value": 105,
+    "unit": "°C",
+    "purpose": "Temperature at which the twin labels OVERLOAD",
+    "rationale": "Taken from the twin labelling rule.",
+    "effect": "Normalises u_T.",
+    "tuning": "Fixed by the labelling rule."
+   },
+   {
+    "symbol": "V_n",
+    "value": 11,
+    "unit": "kV",
+    "purpose": "Nominal primary voltage",
+    "rationale": "All four units are 11/0.415 kV.",
+    "effect": "Reference for u_V.",
+    "tuning": "–"
+   }
+  ]
+ },
+ {
+  "title": "B. Health score",
+  "params": [
+   {
+    "symbol": "λ_W",
+    "value": 0.0005555555555555556,
+    "unit": "1/s",
+    "purpose": "Rate at which accumulated abnormal exposure W_i lowers health",
+    "rationale": "30 min of full-severity abnormal operation (D = 1) reduces the permanent part of H to e⁻¹ ≈ 37 %.",
+    "effect": "Larger λ_W → faster permanent decline.",
+    "tuning": "Choose so that the Sustained-Overload scenario (300 s at D ≈ 1) costs a few percent of health."
+   },
+   {
+    "symbol": "ψ",
+    "value": 0.02,
+    "unit": "per event",
+    "purpose": "Permanent penalty per self-healing event N_i",
+    "rationale": "Each event that needs coordinated relief leaves a 2 % mark (recovery history).",
+    "effect": "Larger ψ → repeated events count more.",
+    "tuning": "Set from how many events per year a utility tolerates before inspection."
+   },
+   {
+    "symbol": "ω",
+    "value": 0.4,
+    "unit": "–",
+    "purpose": "Maximum recoverable derating from short-term stress S_i",
+    "rationale": "Up to 40 % of health can be temporarily lost while the unit is stressed and is regained as it cools.",
+    "effect": "Larger ω → health dips more during an event.",
+    "tuning": "Tune visually against the thermal recovery time of the twin."
+   },
+   {
+    "symbol": "λ_S",
+    "value": 0.008333333333333333,
+    "unit": "1/s",
+    "purpose": "Sensitivity of the recoverable part to stress S_i",
+    "rationale": "120 s·D² of stress gives 63 % of the maximum recoverable derating.",
+    "effect": "Larger λ_S → stress shows up faster.",
+    "tuning": "As for ω."
+   },
+   {
+    "symbol": "t_½",
+    "value": 300,
+    "unit": "s",
+    "purpose": "Half-life of the short-term stress memory S_i",
+    "rationale": "Matches the order of the twin thermal time constants (τ_s = 180–300 steps).",
+    "effect": "Longer t_½ → slower recovery of H.",
+    "tuning": "Set close to the median τ_s of the four units."
+   },
+   {
+    "symbol": "D_warn",
+    "value": 0.15,
+    "unit": "–",
+    "purpose": "Only D above this value counts as abnormal exposure W_i",
+    "rationale": "Same threshold as warning mode, so normal fluctuations do not age the score.",
+    "effect": "–",
+    "tuning": "–"
+   }
+  ]
+ },
+ {
+  "title": "C. Coordination score",
+  "params": [
+   {
+    "symbol": "w_c",
+    "value": 0.45,
+    "unit": "–",
+    "purpose": "Weight of capacity coverage c_j",
+    "rationale": "The first purpose of a supporter is to absorb the excess power.",
+    "effect": "Larger → prefers big-headroom units.",
+    "tuning": "Rank stability check across T1–T4 overload cases."
+   },
+   {
+    "symbol": "w_h",
+    "value": 0.25,
+    "unit": "–",
+    "purpose": "Weight of supporter health H_j/100",
+    "rationale": "A degraded unit should not be loaded further.",
+    "effect": "Larger → prefers healthy units.",
+    "tuning": "As above."
+   },
+   {
+    "symbol": "w_r",
+    "value": 0.2,
+    "unit": "–",
+    "purpose": "Weight of overload risk ρ_j",
+    "rationale": "Penalises supporters that would end close to their own safe limit.",
+    "effect": "Larger → spreads load over more supporters.",
+    "tuning": "Increase if supporters end in WARNING after transfers."
+   },
+   {
+    "symbol": "w_d",
+    "value": 0.1,
+    "unit": "–",
+    "purpose": "Weight of supporter disturbance D_j",
+    "rationale": "A supporter already disturbed should help last.",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "η",
+    "value": 4,
+    "unit": "–",
+    "purpose": "Steepness of the risk curve (L_j′/L_safe,j)^η",
+    "rationale": "Risk stays small at moderate post-transfer loading and rises sharply near L_safe.",
+    "effect": "Larger η → risk only near the limit.",
+    "tuning": "–"
+   },
+   {
+    "symbol": "H_min",
+    "value": 60,
+    "unit": "%",
+    "purpose": "Minimum health for a unit to be allowed to support",
+    "rationale": "Below 60 the unit is treated as degraded.",
+    "effect": "Higher → fewer eligible supporters.",
+    "tuning": "–"
+   },
+   {
+    "symbol": "C_min",
+    "value": 0.2,
+    "unit": "–",
+    "purpose": "Minimum coordination score for eligibility",
+    "rationale": "Excludes supporters with negligible net benefit.",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "H_cap,min",
+    "value": 0.05,
+    "unit": "MVA",
+    "purpose": "Smallest headroom worth negotiating",
+    "rationale": "Avoids splitting transfers into negligible parts.",
+    "effect": "–",
+    "tuning": "–"
+   }
+  ]
+ },
+ {
+  "title": "D. Decision logic",
+  "params": [
+   {
+    "symbol": "D_warn",
+    "value": 0.15,
+    "unit": "–",
+    "purpose": "Enter warning mode",
+    "rationale": "About 90 % loading on an ONAN unit.",
+    "effect": "–",
+    "tuning": "Lower → earlier warnings."
+   },
+   {
+    "symbol": "D_act",
+    "value": 0.45,
+    "unit": "–",
+    "purpose": "Start coordinated self-healing",
+    "rationale": "About 100 % loading on an ONAN unit, before the 115 % overload label.",
+    "effect": "–",
+    "tuning": "Lower → earlier action, more transfers."
+   },
+   {
+    "symbol": "D_rec",
+    "value": 0.1,
+    "unit": "–",
+    "purpose": "Below this value a unit counts as recovered",
+    "rationale": "Below the warning threshold with margin (hysteresis).",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "D_crit",
+    "value": 0.85,
+    "unit": "–",
+    "purpose": "Critical disturbance",
+    "rationale": "Combined with low health it triggers isolation.",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "H_iso",
+    "value": 30,
+    "unit": "%",
+    "purpose": "Health below which a critical unit is flagged for isolation",
+    "rationale": "Do not keep stressing a badly degraded unit.",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "ζ",
+    "value": 0.25,
+    "unit": "–",
+    "purpose": "Minimum fraction of the required relief that supporters must offer",
+    "rationale": "Below 25 % coverage a transfer is not worth it; flag instead.",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "M",
+    "value": 10,
+    "unit": "s",
+    "purpose": "Consecutive seconds with D < D_rec needed to confirm recovery",
+    "rationale": "Prevents declaring recovery on a single noisy sample.",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "T_rec,max",
+    "value": 1200,
+    "unit": "s",
+    "purpose": "Time allowed for recovery before escalation",
+    "rationale": "About four times the largest τ_s.",
+    "effect": "–",
+    "tuning": "–"
+   },
+   {
+    "symbol": "T_esc",
+    "value": 30,
+    "unit": "s",
+    "purpose": "Escalate to isolation if D stays ≥ D_act this long after a transfer",
+    "rationale": "Partial relief that leaves the unit overloaded must not be tolerated for long; 30 s is short compared with the thermal time constants, so the unit is still cool when the flag is raised.",
+    "effect": "Shorter → faster escalation after insufficient relief.",
+    "tuning": "Must exceed τ_c plus the twin load-settling time (~5 s)."
+   },
+   {
+    "symbol": "τ_c",
+    "value": 2,
+    "unit": "s",
+    "purpose": "Simulated message latency per coordination stage",
+    "rationale": "Makes each stage (alert, offers, decision) visible and gives agents time to respond.",
+    "effect": "–",
+    "tuning": "–"
+   }
+  ]
+ },
+ {
+  "title": "Transfer limits",
+  "params": [
+   {
+    "symbol": "m_L",
+    "value": 5,
+    "unit": "%",
+    "purpose": "Margin for the twin's normal load swing",
+    "rationale": "The Normal-Operation profile varies load by ±5 % (sinusoid); targets and supporter limits keep this margin so units do not cross a threshold on the next swing.",
+    "effect": "Larger m_L → more relief requested, less load accepted by each supporter.",
+    "tuning": "Set to the amplitude of normal load variation observed in the dataset."
+   },
+   {
+    "symbol": "L_warn",
+    "value": 85,
+    "unit": "%",
+    "purpose": "Load at which the twin labels WARNING",
+    "rationale": "Supporters are never planned above the twin's own warning threshold, even if their cooling class would allow more.",
+    "effect": "Caps the headroom of ONAF/OFAF units.",
+    "tuning": "Fixed by the labelling rule."
+   }
+  ]
+ }
+]
