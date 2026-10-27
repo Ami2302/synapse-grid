@@ -9,6 +9,7 @@ import { LSTMEngine } from '../ml/lstmEngine';
 import { HybridFuzzyNeuralEngine, DEFAULT_HYBRID_CONFIG, HYBRID_FEATURE_NAMES } from '../ml/hybridEngine';
 import type { HybridConfig, HybridTrainingResult } from '../ml/hybridEngine';
 import { modelRegistry, selectBestClassifier } from '../ml/modelRegistry';
+import { FuzzyMembershipGraphs, AnnNetworkDiagram, HybridSelectionGraphs } from './AlgorithmGraphs';
 import { 
   Brain, 
   Cpu, 
@@ -514,6 +515,9 @@ export const SoftComputingWorkspace: React.FC<SoftComputingWorkspaceProps> = ({
               </div>
             </div>
 
+            {/* Membership function and defuzzification graphs */}
+            <FuzzyMembershipGraphs inputs={fuzzyInputs} result={fuzzyResult} />
+
             {/* Empirical Evaluation Metrics & Confusion Matrix */}
             {fuzzyMetrics && (
               <div className="space-y-4 pt-4 border-t border-grid-border">
@@ -580,6 +584,9 @@ export const SoftComputingWorkspace: React.FC<SoftComputingWorkspaceProps> = ({
                 )}
               </div>
             </div>
+
+            {/* Network architecture diagram: input, two hidden layers, output */}
+            <AnnNetworkDiagram />
 
             {/* Neural Net Architecture Visualizer */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -1106,6 +1113,9 @@ export const SoftComputingWorkspace: React.FC<SoftComputingWorkspaceProps> = ({
                 )}
               </div>
             </div>
+
+            {/* Architecture, weight-selection map and component comparison */}
+            <HybridSelectionGraphs result={hybridResult} />
 
             {hybridResult && (
               <div className="space-y-4 pt-4 border-t border-grid-border">
